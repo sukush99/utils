@@ -1,26 +1,26 @@
 import torch
-from torchvision import datasets, transforms
-import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.pyplot as plt
+from torchvision import transforms
 from PIL import Image
 
-# Define the transform once
+# Transform: PIL Image -> Tensor
 to_tensor = transforms.ToTensor()
 
 def show_images(full_dataset, num_images=10):
     """
-    Display a grid of images from the dataset.
+    Display a number of images from the dataset.
     
     Args:
-        full_dataset (Dataset): PyTorch Dataset object.
+        full_dataset (Dataset): PyTorch Dataset or list of (image, label) tuples.
         num_images (int): Number of images to display.
     """
-
     indices = np.random.choice(len(full_dataset), num_images, replace=False)
+
     for i in indices:
         img, label = full_dataset[i]
         
-        # Convert to tensor if not already
+        # Ensure the image is a tensor
         if isinstance(img, Image.Image):
             img_tensor = to_tensor(img)
         elif isinstance(img, torch.Tensor):
@@ -29,7 +29,9 @@ def show_images(full_dataset, num_images=10):
             raise TypeError(f"Unsupported image type: {type(img)}")
 
         print(f"Label: {label}")
-        npimg = img_tensor.numpy()
-        plt.imshow(np.transpose(npimg, (1, 2, 0)))
+
+        # Convert from tensor to numpy for plotting
+        npimg = img_tensor.permute(1, 2, 0).numpy()  # [C, H, W] -> [H, W, C]
+        plt.imshow(npimg)
         plt.axis('off')
         plt.show()
